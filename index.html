@@ -1,41 +1,29 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>To-Do List App</title>
+    <title>To-Do List</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="app">
-        <h1>To-Do List</h1>
-        <div id="task-form">
-            <input type="text" id="task-title" placeholder="Task title">
-            <textarea id="task-description" placeholder="Task description"></textarea>
-            <input type="date" id="task-due-date">
-            <select id="task-priority">
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-            </select>
-            <button id="add-task">Add Task</button>
-        </div>
-        <div id="task-filters">
-            <select id="status-filter">
-                <option value="all">All</option>
-                <option value="complete">Complete</option>
-                <option value="incomplete">Incomplete</option>
-            </select>
-            <select id="priority-filter">
-                <option value="all">All Priorities</option>
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-            </select>
-            <input type="text" id="search-input" placeholder="Search tasks">
-        </div>
-        <ul id="task-list"></ul>
-    </div>
+    <header>
+        <h1>Task Manager</h1>
+        <input id="search-task" type="text" placeholder="Search for tasks...">
+    </header>
+    <section id="task-list"></section>
+    <form id="task-form">
+        <input id="task-title" type="text" placeholder="Task Title" required>
+        <textarea id="task-desc" placeholder="Task Description"></textarea>
+        <input id="task-date" type="date" required>
+        <select id="task-priority">
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+        </select>
+        <button type="submit">Add Task</button>
+    </form>
+
     <script src="renderer.js"></script>
 </body>
 </html>

@@ -1,21 +1,14 @@
+// db.js (This can be part of renderer.js too for simplicity)
+
 const PouchDB = require('pouchdb');
+const db = new PouchDB('tasks');
+const remoteCouch = 'http://admin:adeego2027@127.0.0.1:5984/tasks';  // Make sure CouchDB server is running
 
-const localDB = new PouchDB('todos');
-const remoteDB = new PouchDB('http://localhost:5984/todos');
-
-function setupSync() {
-    localDB.sync(remoteDB, {
+function syncDatabase() {
+    db.sync(remoteCouch, {
         live: true,
         retry: true
-    }).on('change', function (change) {
-        console.log('Sync change:', change);
-    }).on('error', function (err) {
-        console.error('Sync error:', err);
-    });
+    }).on('change', console.log.bind(console, 'Data changed in CouchDB'));
 }
 
-module.exports = {
-    localDB,
-    remoteDB,
-    setupSync
-};
+module.exports = { syncDatabase };

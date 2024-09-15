@@ -1,19 +1,56 @@
+// renderer.js
 const PouchDB = require('pouchdb');
-const db = new PouchDB('todos');
+const taskDb = new PouchDB('tasks');
+const remoteCouch = 'http://admin:adeego2027@127.0.0.1:5984/tasks';  // Add your CouchDB URL
 
 // DOM Elements
 const taskForm = document.getElementById('task-form');
 const taskList = document.getElementById('task-list');
-const statusFilter = document.getElementById('status-filter');
-const priorityFilter = document.getElementById('priority-filter');
-const searchInput = document.getElementById('search-input');
+const searchTask = document.getElementById('search-task');
 
-// Add task
+// Sync PouchDB to CouchDB
+function syncDb() {
+    taskDb.sync(remoteCouch, {
+        live: true,
+        retry: true
+    }).on('change', fetchAndDisplayTasks);
+}
+
+// Fetch tasks from PouchDB
+async function fetchAndDisplayTasks() {
+    const result = await taskDb.allDocs({include_docs: true});
+    const tasks = result.rows.map(row => row.doc);
+    displayTasks(tasks);
+}
+
+// Display tasks in the list
+function displayTasks(tasks) {
+    taskList.innerHTML = '';
+    if (tasks.length === 0) {
+        taskList.innerHTML = 'No tasks to display.';
+        return;
+    }
+
+    tasks.forEach(task => {
+        const taskElement = document.createElement('div');
+        taskElement.classList.add('task-item');
+        taskElement.innerHTML = `
+            <h3>${task.title} (${task.priority})</h3>
+            <p>${task.description}</p>
+            <p>Due: ${task.dueDate}</p>
+            <button onclick="markComplete('${task._id}')">Complete</button>
+            <button onclick="deleteTask('${task._id}')">Delete</button>
+        `;
+        taskList.appendChild(taskElement);
+    });
+}
+
+// Add new task
 taskForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const title = document.getElementById('task-title').value;
-    const description = document.getElementById('task-description').value;
-    const dueDate = document.getElementById('task-due-date').value;
+    const description = document.getElementById('task-desc').value;
+    const dueDate = document.getElementById('task-date').value;
     const priority = document.getElementById('task-priority').value;
 
     const task = {
@@ -25,90 +62,35 @@ taskForm.addEventListener('submit', async (e) => {
         completed: false
     };
 
-    try {
-        await db.put(task);
-        renderTasks();
-        taskForm.reset();
-    } catch (err) {
-        console.error('Error adding task:', err);
-    }
+    await taskDb.put(task);
+    await fetchAndDisplayTasks();
+    taskForm.reset();
 });
 
-// Render tasks
-async function renderTasks() {
-    const statusValue = statusFilter.value;
-    const priorityValue = priorityFilter.value;
-    const searchValue = searchInput.value.toLowerCase();
-
-    try {
-        const result = await db.allDocs({include_docs: true});
-        const tasks = result.rows
-            .map(row => row.doc)
-            .filter(task => {
-                if (statusValue === 'complete' && !task.completed) return false;
-                if (statusValue === 'incomplete' && task.completed) return false;
-                if (priorityValue !== 'all' && task.priority !== priorityValue) return false;
-                if (searchValue && !task.title.toLowerCase().includes(searchValue) && !task.description.toLowerCase().includes(searchValue)) return false;
-                return true;
-            });
-
-        taskList.innerHTML = tasks.map(task => `
-            <li data-id="${task._id}" class="${task.completed ? 'completed' : ''}">
-                <span>${task.title}</span>
-                <p>${task.description}</p>
-                <span>Due: ${task.dueDate}</span>
-                <span>Priority: ${task.priority}</span>
-                <button class="complete-btn">${task.completed ? 'Undo' : 'Complete'}</button>
-                <button class="edit-btn">Edit</button>
-                <button class="delete-btn">Delete</button>
-            </li>
-        `).join('');
-    } catch (err) {
-        console.error('Error rendering tasks:', err);
-    }
+// Mark task as complete
+async function markComplete(taskId) {
+    const task = await taskDb.get(taskId);
+    task.completed = true;
+    await taskDb.put(task);
+    await fetchAndDisplayTasks();
 }
 
-// Event listeners for task actions
-taskList.addEventListener('click', async (e) => {
-    const taskId = e.target.closest('li').dataset.id;
-    
-    if (e.target.classList.contains('complete-btn')) {
-        try {
-            const task = await db.get(taskId);
-            task.completed = !task.completed;
-            await db.put(task);
-            renderTasks();
-        } catch (err) {
-            console.error('Error updating task:', err);
-        }
-    } else if (e.target.classList.contains('delete-btn')) {
-        try {
-            const task = await db.get(taskId);
-            await db.remove(task);
-            renderTasks();
-        } catch (err) {
-            console.error('Error deleting task:', err);
-        }
-    } else if (e.target.classList.contains('edit-btn')) {
-        // Implement edit functionality
-    }
+// Delete a task
+async function deleteTask(taskId) {
+    const task = await taskDb.get(taskId);
+    await taskDb.remove(task);
+    await fetchAndDisplayTasks();
+}
+
+// Search tasks
+searchTask.addEventListener('input', async (e) => {
+    const query = e.target.value.toLowerCase();
+    const result = await taskDb.allDocs({ include_docs: true });
+    const tasks = result.rows.map(row => row.doc);
+    const filteredTasks = tasks.filter(task => task.title.toLowerCase().includes(query));
+    displayTasks(filteredTasks);
 });
 
-// Event listeners for filters
-statusFilter.addEventListener('change', renderTasks);
-priorityFilter.addEventListener('change', renderTasks);
-searchInput.addEventListener('input', renderTasks);
-
-// Initial render
-renderTasks();
-
-// Setup sync with CouchDB
-const remoteDB = new PouchDB('http://localhost:5984/todos');
-db.sync(remoteDB, {
-    live: true,
-    retry: true
-}).on('change', function (change) {
-    renderTasks();
-}).on('error', function (err) {
-    console.error('Sync error:', err);
-});
+// Initial load and sync
+fetchAndDisplayTasks();
+syncDb();

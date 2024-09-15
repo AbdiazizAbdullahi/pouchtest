@@ -1,15 +1,4 @@
 {
-  "name": "pouchtest",
-  "version": "1.0.0",
-  "description": "syncing test",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Abdiaziz",
-  "license": "ISC"
-}
-{
   "name": "electron-todo-app",
   "version": "1.0.0",
   "description": "A cross-platform desktop to-do list application",
@@ -17,12 +6,11 @@
   "scripts": {
     "start": "electron ."
   },
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "electron": "^13.0.0"
-  },
+  "devDependencies": {},
   "dependencies": {
+    "electron": "^25.0.0",
     "pouchdb": "^7.2.2"
-  }
+  },
+  "author": "Abdiaziz",
+  "license": "ISC"
 }

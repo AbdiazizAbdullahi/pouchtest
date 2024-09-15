@@ -1,45 +1,69 @@
+:root {
+  --bg-color: #f4f4f4;
+  --text-color: #333;
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+  --border-color: #ccc;
+}
+
 body {
   font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
-  color: #333;
+  background-color: var(--bg-color);
+  color: var(--text-color);
   margin: 0;
   padding: 0;
   transition: background-color 0.3s, color 0.3s;
 }
 
 body.dark-mode {
-  background-color: #333;
-  color: #f4f4f4;
+  --bg-color: #333;
+  --text-color: #f4f4f4;
+  --primary-color: #4da3ff;
+  --secondary-color: #a1a8ae;
+  --border-color: #555;
 }
 
 #app {
-  max-width: 600px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 20px;
 }
 
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
 h1 {
-  text-align: center;
+  margin: 0;
 }
 
 #task-list {
-  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.task-item {
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 10px;
 }
 
 button {
-  display: block;
-  width: 100%;
   padding: 10px;
-  margin-top: 20px;
-  background-color: #007bff;
+  background-color: var(--primary-color);
   color: #fff;
   border: none;
+  border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: var(--secondary-color);
 }
 
 #task-form {
@@ -49,9 +73,11 @@ button:hover {
 #task-form input, #task-form textarea, #task-form select {
   width: 100%;
   padding: 10px;
-  margin-top: 10px;
-  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
+  background-color: var(--bg-color);
+  color: var(--text-color);
 }
 
 #filter-options {
@@ -62,6 +88,28 @@ button:hover {
   width: 100%;
   padding: 10px;
   margin-top: 20px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+footer {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+@media (max-width: 600px) {
+  #app {
+    padding: 10px;
+  }
+  
+  footer {
+    flex-direction: column;
+  }
+  
+  footer button {
+    margin-bottom: 10px;
+  }
 }

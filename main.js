@@ -1,6 +1,7 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
+const path = require('path');
 
-function createWindow () {
+function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
@@ -11,6 +12,11 @@ function createWindow () {
   });
 
   mainWindow.loadFile('index.html');
+
+  // Open DevTools in development mode
+  if (process.env.NODE_ENV === 'development') {
+    mainWindow.webContents.openDevTools();
+  }
 }
 
 app.whenReady().then(() => {
@@ -23,4 +29,9 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit();
+});
+
+// IPC handlers for main process
+ipcMain.on('show-notification', (event, title, body) => {
+  new Notification({ title, body }).show();
 });

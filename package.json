@@ -9,3 +9,20 @@
   "author": "Abdiaziz",
   "license": "ISC"
 }
+{
+  "name": "electron-todo-app",
+  "version": "1.0.0",
+  "description": "A cross-platform desktop to-do list application",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^13.0.0"
+  },
+  "dependencies": {
+    "pouchdb": "^7.2.2"
+  }
+}
